@@ -89,8 +89,8 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    orders_of_500_and_700 = Order.where("amount = ? OR amount = ?", 500, 700)
-    orders_of_700_and_1000 = Order.where("amount = ? OR amount = ?", 700, 1000)
+    orders_of_500_and_700 = Order.where(amount: [500,700])
+    orders_of_700_and_1000 = Order.where(amount: [700, 1000])
     # ------------------------------------------------------------
 
     # Expectation
@@ -122,7 +122,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    orders = Order.where('id%2 = 1').limit(4)
+    orders = Order.where(id: ids)
     # ------------------------------------------------------------
 
     # Expectation
@@ -383,7 +383,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    average = Order.where('user_id = ?', user_3.id).average(:amount)
+    average = Order.where(user: user_3).average(:amount)
     # ------------------------------------------------------------
 
     # Expectation
@@ -527,7 +527,7 @@ describe 'ActiveRecord Obstacle Course' do
     # Sal        |         5
 
     # ------------------ ActiveRecord Solution ----------------------
-     custom_results = User.select("name, count(name) as total_order_count").joins(:orders).group(:name)
+     custom_results = User.select("name, count(name) as total_order_count").joins(:orders).group(:name).order(:name)
     # ---------------------------------------------------------------
 
     expect(custom_results[0].name).to eq(user_3.name)

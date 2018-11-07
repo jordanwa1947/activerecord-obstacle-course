@@ -57,7 +57,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-     order_id = Order.order("id ASC").first.id
+     order_id = Order.order("amount ASC").limit(1)[0].id
     # ------------------------------------------------------------
 
     # Expectation
@@ -70,7 +70,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    order_id = Order.order("id DESC").first.id
+    order_id = Order.order("amount DESC").limit(1)[0].id
     # ------------------------------------------------------------
 
     # Expectation
@@ -137,7 +137,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    orders_between_700_and_1000 = Order.where('amount >= 700', 'amount <= 1000')
+    orders_between_700_and_1000 = Order.where(amount: 700..1000)
     # ------------------------------------------------------------
 
     # Expectation
@@ -182,7 +182,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    orders = Order.order('amount DESC')
+    orders = Order.order(amount: :desc)
     # ------------------------------------------------------------
 
     # Expectation
@@ -218,7 +218,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    items = Item.where.not('id >= 3 and id <= 5')
+    items = Item.where.not(id: items_not_included)
     # ------------------------------------------------------------
 
     # Expectation
@@ -234,7 +234,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    grouped_items = Order.group(:id).where('id = 3').first.items.order('name')
+    grouped_items = Order.find(3).items.order('name')
     # ------------------------------------------------------------
 
     # Expectation
@@ -249,7 +249,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    names = Item.all.pluck(:name)
+    names = Item.pluck(:name)
     # ------------------------------------------------------------
 
     # Expectation
@@ -329,7 +329,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    names = Order.joins(:items).find(15).items.pluck(:name)
+    names = Order.joins(:items).last.items.pluck(:name)
     # ------------------------------------------------------------
 
     # Expectation
@@ -353,7 +353,7 @@ describe 'ActiveRecord Obstacle Course' do
     # ------------------------------------------------------------
 
     # ------------------ Using ActiveRecord ----------------------
-    items_for_user_3_third_order = Order.find_by(user_id: 3, id: 9).items.pluck(:name)
+    items_for_user_3_third_order = Order.where(user_id: 3)[2].items.pluck(:name)
     # ------------------------------------------------------------
 
     # Expectation
@@ -527,7 +527,10 @@ describe 'ActiveRecord Obstacle Course' do
     # Sal        |         5
 
     # ------------------ ActiveRecord Solution ----------------------
-     custom_results = User.select("name, count(name) as total_order_count").joins(:orders).group(:name).order(:name)
+     custom_results = User.select("name, count(name) as total_order_count")
+                          .joins(:orders)
+                          .group(:name)
+                          .order(:name)
     # ---------------------------------------------------------------
 
     expect(custom_results[0].name).to eq(user_3.name)
